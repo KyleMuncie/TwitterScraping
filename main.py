@@ -6,6 +6,8 @@ import networkx as nx
 import snscrape.modules.twitter as sntwitter
 import re
 
+# resources: followed tutorial on https://medium.com/dataseries/how-to-scrape-millions-of-tweets-using-snscrape
+# -195ee3594721 to scrape
 
 def kyle():
     # Creating global variables for the amount of tweets I want to pull, and also two arrays for the tweets
