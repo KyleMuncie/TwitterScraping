@@ -66,6 +66,16 @@ def kyle():
             if i < len(words) - 1 and len(words) > 1:
                 antiEdges.append((words[i], words[i + 1]))
 
+    string_list = ["#GetVaccinated", "#antivax", "the", "to", 'to']
+
+    def plot_degree_dist(g, fileName):
+        degrees = [g.degree(n) for n in g.nodes() if n not in string_list]
+        plt.hist(degrees, bins=50, rwidth=20)
+        plt.xlabel('Degree')
+        plt.ylabel('Frequency')
+        plt.title('Degree Distribution of Nodes')
+        plt.savefig(fileName + ".png")
+
     # Creating a graph and then saving it into a png
     g = nx.Graph()
     g.add_nodes_from(list(uniqueProWords))
@@ -73,6 +83,8 @@ def kyle():
     nx.draw(g, with_labels=True, node_size=100)
     plt.title("Network Graph for Pro-Vaccine")
     plt.savefig("networkGraphProVaccine.png")
+    plt.clf()
+    plot_degree_dist(g, "proVaxHistogram")
 
     # clearing the graph and then also clearing the plt
     g.clear()
@@ -85,10 +97,11 @@ def kyle():
     nx.draw(g, with_labels=True, node_size=100)
     plt.title("Network Graph for Anti-Vaccine")
     plt.savefig("networkGraphAntiVaccine.png")
+    plt.clf()
+    plot_degree_dist(g, "antiVaxHistogram")
 
     g.clear()
     plt.clf()
-
 
 
 if __name__ == "__main__":
