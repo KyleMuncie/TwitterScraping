@@ -3,11 +3,8 @@
 # Importing
 import matplotlib.pyplot as plt
 import networkx as nx
-import snap as snap
 import snscrape.modules.twitter as sntwitter
-import pandas as pd
 import re
-import scipy as sp
 
 
 def kyle():
@@ -68,8 +65,8 @@ def kyle():
 
     string_list = ["#GetVaccinated", "#antivax", "the", "to", 'to']
 
-    def plot_degree_dist(g, fileName):
-        degrees = [g.degree(n) for n in g.nodes() if n not in string_list]
+    def plot_degree_dist(importedGraph, fileName):
+        degrees = [importedGraph.degree(n) for n in importedGraph.nodes() if n not in string_list]
         plt.hist(degrees, bins=50, rwidth=20)
         plt.xlabel('Degree')
         plt.ylabel('Frequency')
