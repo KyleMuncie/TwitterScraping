@@ -3,55 +3,79 @@
 # Importing
 import matplotlib.pyplot as plt
 import networkx as nx
+import snap as snap
 import snscrape.modules.twitter as sntwitter
 import pandas as pd
+import re
+import scipy as sp
 
-# Creating global variables for the amount of tweets I want to pull, and also two arrays for the tweets
-maxTweets = 200
-proVaccineTweets = []
-antiVaxTweets = []
 
-# finding the pro-vaccine tweets within the last week
-for i, tweet in enumerate(
-        sntwitter.TwitterSearchScraper('#GetVaccinated since:2022-09-14 until:2022-09-21').get_items()):
-    if i > maxTweets:
-        break
-    proVaccineTweets.append([tweet.date, tweet.id, tweet.content, tweet.user.username])
+def kyle():
+    # Creating global variables for the amount of tweets I want to pull, and also two arrays for the tweets
+    maxTweets = 200
+    proVaccineTweets = []
+    antiVaxTweets = []
 
-# Finding the anti-vaccines tweets withing the last week
-for i, tweet in enumerate(
-        sntwitter.TwitterSearchScraper('#antivax since:2022-09-14 until:2022-09-21').get_items()):
-    if i > maxTweets:
-        break
-    antiVaxTweets.append([tweet.date, tweet.id, tweet.content, tweet.user.username])
+    # finding the pro-vaccine tweets within the last week
+    for i, tweet in enumerate(
+            sntwitter.TwitterSearchScraper('#GetVaccinated since:2022-09-14 until:2022-09-21').get_items()):
+        if i > maxTweets:
+            break
+        proVaccineTweets.append(tweet.content)
 
-# Creating Dataframes for the pro and anti-vaccines
-proOutput = pd.DataFrame(proVaccineTweets, columns=['Datetime', 'Tweet Id', 'Text', 'Username'])
-antiOutput = pd.DataFrame(antiVaxTweets, columns=['Datetime', 'Tweet Id', 'Text', 'Username'])
+    # Finding the anti-vaccines tweets withing the last week
+    for i, tweet in enumerate(
+            sntwitter.TwitterSearchScraper('#antivax since:2022-09-14 until:2022-09-21').get_items()):
+        if i > maxTweets:
+            break
+        antiVaxTweets.append(tweet.content)
 
-proOutput.head()
-antiOutput.head()
+    uniqueProWords = set()
+    uniqueAntiWords = set()
+    proEdges = []
+    antiEdges = []
 
-uniqueWords = []
-listWords = []
-iterator = -1
+    exclusionPattern = re.compile(r'(^https|[\U00010000-\U0010ffff]|^@|\U0000231B)', flags=re.UNICODE)
 
-# We are going to create an array of unique words
-for x in proOutput.Text:
-    iterator = iterator + 1
-    listWords.append([])
-    for word in x.split():
-        listWords[iterator].append(word)
-        if uniqueWords.count(word) < 1:
-            uniqueWords.append(word)
+    # node vals
+    # edge list
+    for tweet in proVaccineTweets:
+        rawWords = tweet.split()
+        words = []
+        for word in rawWords:
+            m = re.search(exclusionPattern, word.strip())
+            if m:
+                continue
+            words.append(word)
+        for i in range(len(words)):
+            uniqueProWords.add(words[i])
+            if i < len(words) - 1 and len(words) > 1:
+                proEdges.append((words[i], words[i + 1]))
 
-# appending a new column with a list of words
-proOutput['Unique'] = listWords
+    for tweet in antiVaxTweets:
+        rawWords = tweet.split()
+        words = []
+        for word in rawWords:
+            m = re.search(exclusionPattern, word.strip())
+            if m:
+                continue
+            words.append(word)
+        for i in range(len(words)):
+            uniqueAntiWords.add(words[i])
+            if i < len(words) - 1 and len(words) > 1:
+                antiEdges.append((words[i], words[i + 1]))
 
-# Exporting the panda dataframes into JSON
-hey = proOutput.to_json('proVaxJSON.json', orient='index')
-ayo = antiOutput.to_json('antiVaxJSON.json', orient='index')
+    g = nx.Graph()
+    g.add_nodes_from(list(uniqueProWords))
+    g.add_edges_from(proEdges)
+    nx.draw(g, with_labels=True, node_size=100)
+    plt.savefig("networkGraphProVaccine.png")
 
-# g = nx.from_pandas_dataframe(proOutput, source='Username', target='Text')
-# nx.draw(g)
-# plt.show()
+    g = nx.Graph()
+    g.add_nodes_from(list(uniqueAntiWords))
+    g.add_edges_from(antiEdges)
+    nx.draw(g, with_labels=True, node_size=100)
+    plt.savefig("networkGraphAntiVaccine.png")
+
+if __name__ == "__main__":
+    kyle()
