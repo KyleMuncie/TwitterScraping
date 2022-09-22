@@ -75,7 +75,7 @@ def kyle():
         plt.hist(pagerank_list, alpha=0.85)
         plt.xlabel('Degree')
         plt.ylabel('Frequency')
-        plt.title('Histogram for Page Rank')
+        plt.title('Histogram for Page Rank ' + fileName)
         plt.savefig(fileName + ".png")
 
     # this function is for clustering
@@ -84,7 +84,7 @@ def kyle():
         plt.hist(clustering_coeffs_list, bins=100, range=(0.0, 1.0), density=False)
         plt.xlabel('Degree')
         plt.ylabel('Frequency')
-        plt.title('Histogram for Clustering')
+        plt.title('Histogram for Clustering ' + fileName)
         plt.savefig(fileName + ".png")
 
     # This function is for degree distribution
@@ -93,7 +93,7 @@ def kyle():
         plt.hist(degrees, bins=50, rwidth=20)
         plt.xlabel('Degree')
         plt.ylabel('Frequency')
-        plt.title('Degree Distribution of Nodes')
+        plt.title('Degree Distribution of Nodes ' + fileName)
         plt.savefig(fileName + ".png")
 
     # Creating a graph and then saving it into a png
