@@ -34,15 +34,16 @@ def kyle():
     uniqueAntiWords = set()
     proEdges = []
     antiEdges = []
-
     exclusionPattern = re.compile(r'(^https|[\U00010000-\U0010ffff]|^@|\U0000231B)', flags=re.UNICODE)
 
     # node vals
     # edge list
     for tweet in proVaccineTweets:
+        # splitting the tweet to get rid of spaces
         rawWords = tweet.split()
         words = []
         for word in rawWords:
+            # using the exclusionPattern to check to see if there are emojis, urls, or @s
             m = re.search(exclusionPattern, word.strip())
             if m:
                 continue
@@ -65,17 +66,30 @@ def kyle():
             if i < len(words) - 1 and len(words) > 1:
                 antiEdges.append((words[i], words[i + 1]))
 
+    # Creating a graph and then saving it into a png
     g = nx.Graph()
     g.add_nodes_from(list(uniqueProWords))
     g.add_edges_from(proEdges)
     nx.draw(g, with_labels=True, node_size=100)
+    plt.title("Network Graph for Pro-Vaccine")
     plt.savefig("networkGraphProVaccine.png")
 
+    # clearing the graph and then also clearing the plt
+    g.clear()
+    plt.clf()
+
+    # creating a new graph for the antivaccines and then also exporting to png
     g = nx.Graph()
     g.add_nodes_from(list(uniqueAntiWords))
     g.add_edges_from(antiEdges)
     nx.draw(g, with_labels=True, node_size=100)
+    plt.title("Network Graph for Anti-Vaccine")
     plt.savefig("networkGraphAntiVaccine.png")
+
+    g.clear()
+    plt.clf()
+
+
 
 if __name__ == "__main__":
     kyle()
